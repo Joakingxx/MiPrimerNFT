@@ -8,3 +8,4 @@ hardhat.config.js
 #Hardhat files
 cache
 artifacts
+hardhat.config.js
