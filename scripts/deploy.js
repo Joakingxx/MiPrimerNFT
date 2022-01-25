@@ -6,6 +6,7 @@ const main = async () => {
 
   let txn = await nftContract.makeAnEpicNFT();
   await txn.wait();
+  console.log("Montado mi NFT #1");
 };
 
 const runMain = async () => {
