@@ -6,44 +6,50 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "hardhat/console.sol";
+
 import { Base64 } from "./libraries/Base64.sol";
 //Heredamos los metodos del contrato que importamos arriba.
 contract MiPrimerNFT is ERC721URIStorage {
-
+    
    using Counters for Counters.Counter;
    Counters.Counter private _tokenIds;
 
   string baseSvg = "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 350 350'><style>.base { fill: white; font-family: serif; font-size: 24px; }</style><rect width='100%' height='100%' fill='black' /><text x='50%' y='50%' class='base' dominant-baseline='middle' text-anchor='middle'>";
 
-  string[] firstWords = ["Neymar Jr", "Sadio Mane", "Raheem Sterling", "Lorenzo Insigne", "Eden Hazard", "Oyarzabal"];
-  string[] secondWords = ["Robert Lewandowski", "Cristiano Ronaldo", "Kylian Mbappe", "Harry Kane", "Luis Suarez", "Erling Haaland"];
-  string[] thirdWords = ["Lionel Messi", "Mohamed Salah", "Angel Di Maria", "Riyad Mahrez", "Hakim Ziyech", "Federico Chiesa"];
+  string[] firstWords = ["NeymarJr", "Mane", "Sterling", "Insigne", "Hazard", "Oyarzabal"];
+  string[] secondWords = ["Lewandowski", "Ronaldo", "Mbappe", "Kane", "Suarez", "Haaland"];
+  string[] thirdWords = ["Messi", "Salah", "Di Maria", "Mahrez", "Ziyech", "Chiesa"];
 
-  constructor() ERC721 ("LosMejoresDelanteros", "LosMejoresDelanteros"){
+event NewEpicNFTMinted(address sender, uint256 tokenId);
+
+  constructor() ERC721 ("LosMejoresDelanterosNFT", "LOSMEJORESDELANTEROS"){
        console.log("Este es mi contrato NFT");
+        
    }
    
    // Funcion para elegir una palabra random del array.
   function pickRandomFirstWord(uint256 tokenId) public view returns (string memory) {
-    
-    uint256 rand = random(string(abi.encodePacked("THIRD_WORD", Strings.toString(tokenId))));
+     
+    uint256 rand = random(string(abi.encodePacked("FIRST_WORD", Strings.toString(tokenId))));
     
     rand = rand % firstWords.length;
     return firstWords[rand];
   }
 
-    function pickRandomSecondWord(uint256 tokenId) public view returns (string memory) {
+  function pickRandomSecondWord(uint256 tokenId) public view returns (string memory) {
     uint256 rand = random(string(abi.encodePacked("SECOND_WORD", Strings.toString(tokenId))));
     rand = rand % secondWords.length;
     return secondWords[rand];
   }
 
 
-    function pickRandomThirdWord(uint256 tokenId) public view returns (string memory) {
+  function pickRandomThirdWord(uint256 tokenId) public view returns (string memory) {
     uint256 rand = random(string(abi.encodePacked("THIRD_WORD", Strings.toString(tokenId))));
     rand = rand % thirdWords.length;
     return thirdWords[rand];
   }
+
+
 
   function random(string memory input) internal pure returns (uint256) {
       
@@ -61,15 +67,13 @@ function makeAnEpicNFT() public {
     
     string memory finalSvg = string(abi.encodePacked(baseSvg, first, second, third, "</text></svg>"));
 
-    string memory json = Base64.encode(
+   string memory json = Base64.encode(
         bytes(
             string(
                 abi.encodePacked(
                     '{"name": "',
-                    // We set the title of our NFT as the generated word.
                     combinedWord,
-                    '", "description": "A highly acclaimed collection of squares.", "image": "data:image/svg+xml;base64,',
-                    // We add data:image/svg+xml;base64 and then append our base64 encode our svg.
+                    '", "description": "Delantera de futbol al azar", "image": "data:image/svg+xml;base64,',
                     Base64.encode(bytes(finalSvg)),
                     '"}'
                 )
@@ -77,23 +81,31 @@ function makeAnEpicNFT() public {
         )
     );
 
-    string memory finalTokenUri = string(
-        abi.encodePacked("data:application/json;base64,", json)
-    );
+   string memory finalTokenUri = string(
+    abi.encodePacked("data:application/json;base64,", json)
+);
 
+console.log("\n--------------------");
+console.log(
+    string(
+        abi.encodePacked(
+            "https://nftpreview.0xdev.codes/?code=",
+            finalTokenUri
+        )
+    )
+);
+console.log("--------------------\n");
+console.log(finalTokenUri);
+console.log("--------------------\n");
 
-    console.log("\n--------------------");
-    console.log(finalTokenUri);
-    console.log("--------------------\n");
-
-    _safeMint(msg.sender, newItemId);
+_safeMint(msg.sender, newItemId);
 
     
-    _setTokenURI(newItemId, finalTokenUri);
+_setTokenURI(newItemId, finalTokenUri);
 
-    _tokenIds.increment();
+_tokenIds.increment();
 
-    console.log("An NFT w/ ID %s has been minted to %s", newItemId, msg.sender);
+emit NewEpicNFTMinted(msg.sender, newItemId);
 
     }
 }
